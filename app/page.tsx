@@ -4,7 +4,6 @@ import React, { useState } from 'react'
 import { Input } from "./components/ui/input";
 import { Label } from "./components/ui/label";
 import { ZodIssue } from "zod";
-import { Campus } from '@prisma/client';
 import { Formik } from "formik";
 import { Utility } from './classes/ClientUtility';
 import { Textarea } from './components/ui/textarea';
@@ -23,11 +22,7 @@ export type State = {
   status?: number;
 };
 
-const FellowshipForm = ({ 
-    campuses 
-} : {
-    campuses: Campus[]
-}) => {
+const FellowshipForm = () => {
 
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [formSubmitted, setFormSubmitted] = useState(false);
