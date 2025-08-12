@@ -10,6 +10,7 @@ import { Textarea } from './components/ui/textarea';
 import { sendMail } from './lib/sendEmail';
 import { Montserrat } from "next/font/google"
 import { submissionOfPaperSchema } from './api/schemaDefinitions/paper-submission';
+import Script from 'next/script';
 
 const montserrat = Montserrat({
     subsets: ['latin']
@@ -279,10 +280,19 @@ const FellowshipForm = () => {
                                 />
                                 {touched?.paper && errors?.paper && <div className='error-feedback'>{errors?.paper}</div>}
                             </div>
-                            
                         </div>
-                        <button type="submit" disabled={isSubmitting} style={{background:"black"}} className="cursor-pointer bg-black text-white px-4 py-2 rounded">
-                            {isSubmitting ? "Submitting..." : "Submit"}
+                        <input id="form_botcheck" name="form_botcheck"type="hidden" value="" />
+                        <button 
+                          type="submit" 
+                          data-sitekey="6LdaNSQpAAAAAAODPgR3XroopgEJ1gyLUac8yv51" 
+                          data-callback='onSubmit' 
+                          disabled={isSubmitting} 
+                          style={{background:"black"}} 
+                          data-action='submit' 
+                          data-loading-text="Please wait..."
+                          className="g-recaptcha cursor-pointer bg-black text-white px-4 py-2 rounded"
+                        >
+                          {isSubmitting ? "Submitting..." : "Submit"}
                         </button>
                     </form>
                 )
