@@ -1,0 +1,15 @@
+- Onboarding
+    - Gets redirected to fellowhub.com/onboarding, on this page, they then select any of these two:
+        - Individual
+            - redirects them to fellowhub.com/onboarding/individual
+        - Fellowship
+            - redirects them to fellowhub.com/onboarding/fellowship
+
+
+- Authentication
+    - On completion of the onboarding process, a link would be sent to their mail which would include the subdomain of the fellowship they have joined, for example, 
+      someone who just joined dlcfoau would be redirected to dlcfoau.fellowhub.com/auth/login where they enter their email and password, and the system intelligently query that 
+      data for dlcfoau alone
+
+
+- Workspace Setup
