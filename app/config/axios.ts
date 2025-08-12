@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const axiosFetch = axios.create({
-    baseURL:  "http://localhost:2000"
+    baseURL:  process.env.NEXT_PUBLIC_BRAND_BASE_URL
 })
 
 export default axiosFetch;
