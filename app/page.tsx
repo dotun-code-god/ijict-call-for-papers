@@ -7,10 +7,10 @@ import { ZodIssue } from "zod";
 import { Formik } from "formik";
 import { Utility } from './classes/ClientUtility';
 import { Textarea } from './components/ui/textarea';
-import { sendMail } from './lib/sendEmail';
 import { Montserrat } from "next/font/google"
 import { submissionOfPaperSchema } from './api/schemaDefinitions/paper-submission';
-import Script from 'next/script';
+import { getRecaptchaToken } from './lib/get-recaptcha';
+import { submitPaper } from './actions/submit-paper';
 
 const montserrat = Montserrat({
     subsets: ['latin']
@@ -47,60 +47,14 @@ const FellowshipForm = () => {
       try{
         setIsSubmitting(true);
 
-        // Upload files to the server
-        const { paper, ...otherFields } = fellowshipData;
-        let document = null;
+        const token = await getRecaptchaToken();
 
-        let paperURL = "";
-        
-        if(paper instanceof File){
-            try{
-                let { file } = await Utility.uploadFilesToServer(paper);
-                paperURL = file?.src;
-            }catch(err){
-                throw new Error("File Upload Failed");
-            }
-        }else{
-            throw new Error("Ensure you upload the necessary files to continue.");
-        }
-        
-        const generateEmailTemplate = `
-            <div style="font-family: Arial, sans-serif; color: #333;">
-                <h2>Below is the submission details for this paper</h2> <br />
+        const res = await submitPaper(token, fellowshipData);
 
-                <p>First Name: ${otherFields.first_name}</p>
-                <p>Last Name: ${otherFields.last_name}</p>
-                <p>Email: ${otherFields.email}</p>
-                <p>Phone Number: ${otherFields?.phone_number}</p>
-                <p>University/Organization/Affiliation: ${otherFields?.university_organization_affiliation}</p>
-                <p>Department: ${otherFields?.department}</p>
-                <p>Full Paper Title: ${otherFields?.full_paper_title}</p>
-                <p>All Authors: ${otherFields?.authors}</p>
-                <p>Abstract of Paper: ${otherFields?.abstract}</p>
-                <p>Keywords: ${otherFields?.keywords}</p>
-                <p>Additional Information: ${otherFields?.additional_information}</p>
-                <p>Attached Full Paper: <a href="${paperURL}">${paperURL}</a></p>
-            </div>
-        `;
-        console.log(generateEmailTemplate);
-
-        const emailParams1 = {
-            from: process.env.FELLOWHUB_EMAIL as string,
-            sendTo: "ijict.oauife@gmail.com",
-            subject: `Paper Submission for IJICT`,
-            html: generateEmailTemplate
+        if(res.success){
+          setFormSubmitted(true);
         }
 
-        const emailParams2 = {
-            from: process.env.FELLOWHUB_EMAIL as string,
-            sendTo: "ijict@oauife.edu.ng",
-            subject: `Paper Submission for IJICT`,
-            html: generateEmailTemplate
-        }
-        await sendMail(emailParams1);
-        await sendMail(emailParams2);
-
-        setFormSubmitted(true);
       }catch(error:any){
           console.error(error.message);
       }finally{
@@ -111,6 +65,7 @@ const FellowshipForm = () => {
   return (
     formSubmitted ? (
         <div className="max-w-3xl mx-auto space-y-8 p-6 bg-white shadow-md rounded-xl" style={montserrat.style}>
+            <img src="/OAU-logo.png" className='mx-auto w-56' alt="" />
             <h2 className="text-2xl font-bold">Paper submitted successfully</h2>
             <button className='cursor-pointer underline text-blue-600' onClick={() => setFormSubmitted(false)}>Submit another paper</button>
         </div>
@@ -121,17 +76,19 @@ const FellowshipForm = () => {
                 const validateFn = await Utility.zodValidate(submissionOfPaperSchema);
                 return validateFn(values);
             }}
-            onSubmit={async (values) => {
+            onSubmit={async (values, formikHelpers) => {
                 try{
                     await submit(values);
                 }catch(error){
                     console.log({error});
+                }finally{
+                  formikHelpers.resetForm();
                 }
             }}
         >
             {
                 ({ values, errors, touched, setFieldValue, validateForm, setTouched, handleBlur, handleChange, handleSubmit }) => (
-                    <form method="POST" onSubmit={handleSubmit} style={montserrat.style} className="my-4 max-w-3xl mx-auto space-y-8 p-6 bg-white shadow-md rounded-xl">
+                    <form id='call-for-paper' method="POST" onSubmit={handleSubmit} style={montserrat.style} className="my-4 max-w-3xl mx-auto space-y-8 p-6 bg-white shadow-md rounded-xl">
                         <div className="space-y-4">
                             <img src="/OAU-logo.png" className='mx-auto w-56' alt="" />
                             <h2 className="text-2xl font-bold text-center">IFE Journal of Information and Communication Technology</h2>
@@ -281,18 +238,8 @@ const FellowshipForm = () => {
                                 {touched?.paper && errors?.paper && <div className='error-feedback'>{errors?.paper}</div>}
                             </div>
                         </div>
-                        <input id="form_botcheck" name="form_botcheck"type="hidden" value="" />
-                        <button 
-                          type="submit" 
-                          data-sitekey="6LdaNSQpAAAAAAODPgR3XroopgEJ1gyLUac8yv51" 
-                          data-callback='onSubmit' 
-                          disabled={isSubmitting} 
-                          style={{background:"black"}} 
-                          data-action='submit' 
-                          data-loading-text="Please wait..."
-                          className="g-recaptcha cursor-pointer bg-black text-white px-4 py-2 rounded"
-                        >
-                          {isSubmitting ? "Submitting..." : "Submit"}
+                        <button type="submit" disabled={isSubmitting} style={{background:"black"}} className="disabled:!bg-black/30 hover:!bg-black/80 cursor-pointer bg-black text-white px-4 py-2 rounded">
+                            {isSubmitting ? "Submitting..." : "Submit"}
                         </button>
                     </form>
                 )

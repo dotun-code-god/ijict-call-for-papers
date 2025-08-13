@@ -5,7 +5,7 @@ import cuid from "cuid";
 import fs from "fs/promises";
 
 export class Utility {
-    public static async uploadFile(file: File, maxSize: number = 5 * 1024 * 1024) {
+    public static async uploadFile(file: File, maxSize: number = 10 * 1024 * 1024) {
         const size = file?.size; // mb;
 
         if (size == 0 || size >= maxSize) {
@@ -26,7 +26,7 @@ export class Utility {
             const src = path.join(location, file_name);
             await fs.writeFile(src, buffer);
     
-            const upload = await cloudinary.uploader.upload(src);
+            const upload = await cloudinary.uploader.upload(src, { resource_type: "raw" });
     
             await fs.rm(src);
     

@@ -16,11 +16,11 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-        {/* reCAPTCHA v3 */}
-        <Script src="https://www.google.com/recaptcha/api.js?render=6LdaNSQpAAAAAAODPgR3XroopgEJ1gyLUac8yv51" strategy="beforeInteractive"/>
       </head>
       <body>
         {children}
+        {/* reCAPTCHA v3 */}
+        <Script src={`https://www.google.com/recaptcha/api.js?render=${process.env.NEXT_PUBLIC_CAPTCHA_SITE_KEY}`} strategy="afterInteractive"/>
       </body>
     </html>
   );
