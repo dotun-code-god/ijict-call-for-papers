@@ -69,31 +69,22 @@ export async function submitPaper(token: string | null, data: SubmissionPaperTyp
             <p>Attached Full Paper: <a href="${paperURL}">${paperURL}</a></p>
         </div>
     `;
-    console.log(generateEmailTemplate);
 
-    const test = {
+    const emailParams1 = {
         from: process.env.FELLOWHUB_EMAIL as string,
-        sendTo: "dotun494@gmail.com",
+        sendTo: "ijict.oauife@gmail.com",
         subject: `Paper Submission for IJICT`,
         html: generateEmailTemplate
     }
-    await sendMail(test);
 
-    // const emailParams1 = {
-    //     from: process.env.FELLOWHUB_EMAIL as string,
-    //     sendTo: "ijict.oauife@gmail.com",
-    //     subject: `Paper Submission for IJICT`,
-    //     html: generateEmailTemplate
-    // }
-
-    // const emailParams2 = {
-    //     from: process.env.FELLOWHUB_EMAIL as string,
-    //     sendTo: "ijict@oauife.edu.ng",
-    //     subject: `Paper Submission for IJICT`,
-    //     html: generateEmailTemplate
-    // }
-    // await sendMail(emailParams1);
-    // await sendMail(emailParams2);
+    const emailParams2 = {
+        from: process.env.FELLOWHUB_EMAIL as string,
+        sendTo: "ijict@oauife.edu.ng",
+        subject: `Paper Submission for IJICT`,
+        html: generateEmailTemplate
+    }
+    await sendMail(emailParams1);
+    await sendMail(emailParams2);
 
     return {
         success: true,
